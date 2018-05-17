@@ -1,0 +1,14 @@
+{
+  "name": "cryptobird-sockets",
+  "version": "1.0.0",
+  "description": "WebSocket server for cryptobird",
+  "main": "example/app.js",
+  "scripts": {
+    "start": "node ."
+  },
+  "author": "QuantumSheep",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^10.1.1"
+  }
+}
