@@ -13,15 +13,7 @@ class SocketServer extends EventEmitter {
             socket.setTimeout(0);
             socket.setNoDelay();
 
-            console.log('yes');
-
             this.emit('connection', socket);
-
-            if (!isws) {
-                socket.on('data', data => {
-                    this.emit('data', data);
-                });
-            }
         });
     }
 

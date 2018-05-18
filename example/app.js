@@ -7,13 +7,11 @@ const wsserver = new WebSocketServer();
 
 wsserver.on('connection', socket => {
     socket.on('data', data => {
-        socket.emit("Roger that!")
-
-        console.log(data.toString());
+        
     });
 });
 
-wsserver.listen(1338);
+wsserver.listen(1339);
 
 
 /**
