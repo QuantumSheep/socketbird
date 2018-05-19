@@ -7,6 +7,7 @@ const EventEmitter = require('events');
 
 const SocketServer = require('./SocketServer');
 const WebSocketConnection = require('./WebSocketConnection');
+const SocketUtils = require('./SocketUtils');
 
 class WebSocketServer extends EventEmitter {
     constructor() {
@@ -22,31 +23,14 @@ class WebSocketServer extends EventEmitter {
             socket.on('data', data => {
                 if (socket.writable && socket.readable) {
                     if (socket.id && this.clients[socket.id]) {
-                        let len = data[1] - 0x80;
-
-                        if (len <= 125) {
-                            const key = Buffer.from([data[2], data[3], data[4], data[5]]);
-                            let decoded = Buffer.alloc(len);
-
-                            for (let i = 0; i < len; i++) {
-                                decoded[i] = data[6 + i] ^ key[i % 4];
-                            }
-
-                            this.clients[socket.id].emit('data', decoded.toString());
+                        if (data[0] == 0x88) {
+                            this.clients[socket.id].emit('close');
                         } else {
-                            len = (data[2] << 8) + data[3];
-
-                            const key = Buffer.from([data[4], data[5], data[6], data[7]]);
-
-                            let decoded = Buffer.alloc(len);
-
-                            for (let i = 0; i < len; i++) {
-                                decoded[i] = data[8 + i] ^ key[i % 4];
-                            }
-
-                            this.clients[socket.id].emit('data', decoded.toString());
+                            SocketUtils.decode(data, decoded => {
+                                this.clients[socket.id].emit('data', decoded.toString());
+                            });
                         }
-                    } else {
+                    } else if (data[0] == 0x47) {
                         const datastr = data.toString();
 
                         if (datastr.substring(0, 5).match(/GET/) && datastr.match(/WebSocket/)) {
@@ -82,6 +66,11 @@ class WebSocketServer extends EventEmitter {
         });
     }
 
+    /**
+     * Listen WebSocket to a specific port
+     * 
+     * @param {number} port 
+     */
     listen(port) {
         this.server.listen(port);
     }

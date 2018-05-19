@@ -6,10 +6,10 @@ const path = require('path');
 const wsserver = new WebSocketServer(http);
 
 wsserver.on('connection', socket => {
-    socket.on('data', data => {
-        console.log(data);
+    socket.send('Connected to the server!');
 
-        socket.send('hi');
+    socket.on('data', data => {
+        console.log(`${socket.socket.id}: ${data}`);
     });
 });
 

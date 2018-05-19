@@ -4,6 +4,8 @@ const {
 const crypto = require('crypto');
 const EventEmitter = require('events');
 
+const SocketUtils = require('./SocketUtils');
+
 class WebSocketConnection extends EventEmitter {
     /**
      * 
@@ -44,8 +46,15 @@ class WebSocketConnection extends EventEmitter {
         }
     }
 
+    /**
+     * Send data to this socket connection
+     * 
+     * @param {string} data 
+     */
     send(data) {
-        this.socket.write(Buffer.from(data));
+        SocketUtils.encode(data, encoded => {
+            this.socket.write(encoded);
+        });
     }
 }
 
