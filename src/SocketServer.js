@@ -5,13 +5,12 @@ const EventEmitter = require('events');
 class SocketServer extends EventEmitter {
     constructor(isws = false) {
         super();
-
-        this.clients = [];
+        
         this.emmiter = new EventEmitter();
 
         this.server = net.createServer(socket => {
             socket.setTimeout(0);
-            socket.setNoDelay();
+            socket.setNoDelay(true);
 
             this.emit('connection', socket);
         });

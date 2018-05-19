@@ -9,18 +9,25 @@
 </head>
 
 <body>
-
     <script>
         const ws = new WebSocket('ws://localhost:1339')
 
         ws.onopen = e => {
-            console.log('nice');
-            ws.send('noice');
+            console.log('Connected to the server!');
+            ws.send('Client connected!');
         };
 
         ws.onmessage = msg => {
             console.log(msg);
+        };
+
+        ws.onerror = err => {
+            console.log(err);
         }
+
+        ws.onclose = () => {
+            console.log('Connection closed.');
+        };
     </script>
 </body>
 
