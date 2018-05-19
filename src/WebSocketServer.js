@@ -3,20 +3,12 @@ const fs = require("fs");
 const crypto = require('crypto');
 const path = require('path');
 
-const {
-    Server
-} = require('http');
-
 const EventEmitter = require('events');
 
 const SocketServer = require('./SocketServer');
 const WebSocketConnection = require('./WebSocketConnection');
 
 class WebSocketServer extends EventEmitter {
-    /**
-     * 
-     * @param {Server} http 
-     */
     constructor() {
         super();
 
