@@ -19,7 +19,7 @@ class WebSocketServer extends EventEmitter {
         this.clients = {};
         this.server = new SocketServer();
 
-        this.server.server.addListener('connection', socket => {
+        this.server.server.on('connection', socket => {
             socket.on('data', data => {
                 if (socket.writable && socket.readable) {
                     if (socket.id && this.clients[socket.id]) {
@@ -33,8 +33,8 @@ class WebSocketServer extends EventEmitter {
                     } else if (data[0] == 0x47) {
                         const datastr = data.toString();
 
-                        if (datastr.substring(0, 5).match(/GET/) && datastr.match(/WebSocket/)) {
-                            const key = crypto.createHash("sha1").update(datastr.match(/Sec-WebSocket-Key: (.+)\r\n/)[1] + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11', 'binary').digest('base64');
+                        if (datastr.substring(0, 5).match(/GET/) && datastr.match(/WebSocket/i)) {
+                            const key = crypto.createHash("sha1").update(datastr.match(/Sec-WebSocket-Key: (.+)\r\n/i)[1] + '258EAFA5-E914-47DA-95CA-C5AB0DC85B11', 'binary').digest('base64');
 
                             const wssid = crypto.randomBytes(32).toString('hex');
 
@@ -76,13 +76,14 @@ class WebSocketServer extends EventEmitter {
     }
 
     /**
-     * Listen to an event
+     * Send data to every socket connexions
      * 
-     * @param {string | symbol} type 
-     * @param {(...args: any[]) => void} listener
+     * @param {string} data 
      */
-    on(type, listener) {
-        return super.addListener(type, listener);
+    broadcast(data) {
+        for (let i in this.clients) {
+            this.clients[i].send(data);
+        }
     }
 }
 
