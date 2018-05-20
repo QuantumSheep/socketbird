@@ -46,7 +46,6 @@ const httpserver = http.createServer((req, res) => {
 });
 
 httpserver.on('upgrade', (req, socket, head) => {
-    console.log('hey');
     proxyserver.ws(req, socket, head, {
         target: 'ws://localhost:3002'
     });
