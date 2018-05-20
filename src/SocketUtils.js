@@ -19,7 +19,7 @@ class SocketUtils {
             }
 
             cb(decoded.toString());
-        } else if (data_buf.length >= 126 && data_buf.length <= 65535) {
+        } else if (data.length >= 126 && data.length <= 65535) {
             len = (data[2] << 8) + data[3];
 
             const key = Buffer.from([data[4], data[5], data[6], data[7]]);
@@ -50,30 +50,30 @@ class SocketUtils {
      * Encode WebSocket Buffer
      * 
      * @param {string} data 
-     * @param {(encoded: string) => void} cb 
+     * @param {(encoded: Buffer) => void} cb 
      */
     static encode(data, cb = (encoded) => {}) {
         const data_buf = Buffer.from(data);
         let offset = 0;
 
         if (data_buf.length <= 125) {
-            offset = 6;
+            offset = 2;
         } else if (data_buf.length >= 126 && data_buf.length <= 65535) {
-            offset = 8;
+            offset = 4;
         } else {
-            offset = 14;
+            offset = 10;
         }
 
         const target = Buffer.allocUnsafe(data_buf.length + offset);
 
-        if (offset == 6) {
-            target[1] = data_buf.length | 0x80;
-        } else if (offset == 8) {
-            target[1] = 0xfe;
+        if (offset == 2) {
+            target[1] = data_buf.length;
+        } else if (offset == 4) {
+            target[1] = 126;
             target[2] = (data_buf.length >> 8);
             target[3] = (data_buf.length);
         } else {
-            target[1] = 0xfe;
+            target[1] = 127;
             target[2] = (data_buf.length >> 56);
             target[3] = (data_buf.length >> 48);
             target[4] = (data_buf.length >> 40);
@@ -86,15 +86,8 @@ class SocketUtils {
 
         target[0] = 0x81;
 
-        const key = crypto.randomBytes(4);
-
-        target[offset - 4] = key[0];
-        target[offset - 3] = key[1];
-        target[offset - 2] = key[2];
-        target[offset - 1] = key[3];
-
         for (let i = 0; i < data_buf.length; i++) {
-            target[offset + i] = data_buf[i] ^ key[i % 4];
+            target[offset + i] = data_buf[i];
         }
 
         cb(target);
