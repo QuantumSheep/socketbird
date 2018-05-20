@@ -6,27 +6,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css"
+        integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        .chat {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        ul#messages {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+        }
+
+        ul#messages li {
+            padding: 5px;
+        }
+
+        ul#messages li:nth-child(oven) {
+            background-color: rgba(0, 0, 0, 0.103);
+        }
+    </style>
 </head>
 
 <body>
+    <div class="d-flex flex-column h-100">
+        <ul id="messages"></ul>
+        <form name="inputs" class="d-flex m-0">
+            <div class="w-100">
+                <input type="text" class="form-control px-2 w-100" name="username" placeholder="Your username">
+                <input type="text" class="form-control px-2 w-100" name="message" placeholder="Type your message here">
+            </div>
+
+            <button type="submit" class="btn text-white bg-primary m-0">Send</button>
+        </form>
+    </div>
     <script>
-        const ws = new WebSocket('ws://localhost:1339')
-
-        ws.onopen = e => {
-            ws.send('Client connected!');
-        };
-
+        const ws = new WebSocket('ws://' + window.location.host + '/');
         ws.onmessage = msg => {
-            console.log(msg.data);
-        };
+            const parsed = JSON.parse(msg.data);
 
-        ws.onerror = err => {
-            console.log(err);
+            if (parsed.type == 'message') {
+                const line = document.createElement('li');
+                line.innerText = `${parsed.from}: ${parsed.content}`;
+
+                document.getElementById('messages').appendChild(line);
+            }
         };
 
         ws.onclose = () => {
             console.log('Connection closed.');
         };
+
+        document.inputs.addEventListener('submit', e => {
+            e.preventDefault();
+
+            if(e.target.username.value && e.target.message.value) {
+                ws.send(JSON.stringify({
+                    username: e.target.username.value,
+                    message: e.target.message.value
+                }));
+
+                e.target.message.value = "";
+            }
+        });
+
+        document.inputs.message.addEventListener('keydown', e => {
+            if(e.Key == 'Enter') {
+                document.inputs.submit();
+            }
+        });
     </script>
 </body>
 

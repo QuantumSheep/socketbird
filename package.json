@@ -8,7 +8,9 @@
   },
   "author": "QuantumSheep",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "http-proxy": "^1.17.0"
+  },
   "devDependencies": {
     "@types/node": "^10.1.1"
   }
