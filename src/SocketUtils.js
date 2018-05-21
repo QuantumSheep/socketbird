@@ -19,7 +19,7 @@ class SocketUtils {
             }
 
             cb(decoded.toString());
-        } else if (data.length >= 126 && data.length <= 65535) {
+        } else if (len >= 126 && len <= 65535) {
             len = (data[2] << 8) + data[3];
 
             const key = Buffer.from([data[4], data[5], data[6], data[7]]);
@@ -32,7 +32,7 @@ class SocketUtils {
 
             cb(decoded);
         } else {
-            len = (data[2] << 8) + (data[3] << 4) + (data[4] << 4) + (data[5] << 8) + (data[6] << 8) + (data[7] << 8) + (data[8] << 8) + data[9];
+            len = (data[2] << 56) + (data[3] << 48) + (data[4] << 40) + (data[5] << 32) + (data[6] << 24) + (data[7] << 16) + (data[8] << 8) + data[9];
 
             const key = Buffer.from([data[10], data[11], data[12], data[13]]);
 
